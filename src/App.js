@@ -1,7 +1,7 @@
 import logo from './logo.svg';
 import './App.css';
 import './index.css';
-import React from 'react'
+import React, { Component, useRef } from 'react'
 import ReactPlayer from 'react-player';
 import captureVideoFrame from 'capture-video-frame';
 import "react-video-trimmer/dist/style.css";
@@ -9,10 +9,6 @@ import { ReactMediaRecorder } from "react-media-recorder";
 import CanvasDraw from 'react-canvas-draw';
 import ReactCrop from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
-
-// const RecordView = () => (
-
-// );
 
 class App extends React.Component {
 	constructor (props) {
@@ -27,6 +23,10 @@ class App extends React.Component {
         width: 30,
         aspect: 16 / 9,
       },
+      save_data: null,
+      load_data: null,
+      new_image: null,
+
     }
   }
 
@@ -44,6 +44,16 @@ class App extends React.Component {
     if(this.state.image != null){
         return this.state.image;
     }
+  }
+
+  async loadData(){
+    await this.setState({
+      load_data : null,
+    })
+
+    await this.setState({
+      load_data : this.state.save_data,
+    })
   }
 
   // ------------------- image cropping section ------------------------
@@ -108,11 +118,14 @@ class App extends React.Component {
       });
     }
 
+
       // --------------------------------------------------------
 
   render() {
     const { crop, croppedImageUrl, src } = this.state;
+
     return (
+      
     	<div className="record-frame">
       <ReactPlayer 
           ref={player => { this.player = player }}
@@ -156,42 +169,62 @@ class App extends React.Component {
           />
 
         {/* --------------- Drawing on image ---------------  */}
-        <h2>Background Image</h2>
+        <h2>Drawing on Image</h2>
                 <p>You can also set the `imgSrc` prop to draw on a background-image.</p>
                 <p>
                   It will automatically resize to fit the canvas and centered vertically
                   & horizontally.
                 </p>
                 {this.state.image? 
-                <div style={{width: "auto", height: "auto"}}>     
+                <div style={{width: "400px", height: "400px"}}>    
+                      <button onClick={() =>  this.setState({  save_data: this.saveableCanvas.getSaveData() })} >
+                      {/* <button onClick={() => {localStorage.setItem("savedDrawing", this.saveableCanvas.getSaveData());}}> */}
+                        Save
+                      </button>
                   <CanvasDraw
-                    brushColor="rgba(155,12,60,0.3)"
+                    ref={canvasDraw => (this.saveableCanvas = canvasDraw)}
+                    brushColor="red"
                     imgSrc={this.state.image}
-                    
                   />
-                     <button onClick={() => {
-                      const frame = captureVideoFrame(this.state.image)
-                      console.log('captured frame', frame)
-                      this.setState({ src: frame.dataUri })
-                    }}>Capture Drawing</button>
+                  
                 </div>
                 : null}
 
-          {src && (
-          <div style={{width: "640px", height: "480px"}}>
-          <ReactCrop
-            src={src? src: null}
-            crop={crop}
-            ruleOfThirds
-            onImageLoaded={this.onImageLoaded}
-            onComplete={this.onCropComplete}
-            onChange={this.onCropChange}
-          />
+
+          {this.state.image && (
+          <div style={{width: "400px", height: "400px"}}>
+           {/* <button onClick={() => {this.loadableCanvas.loadSaveData(localStorage.getItem("savedDrawing"));}}>Load Image</button> */}
+
+           <CanvasDraw
+                      disabled
+                      hideGrid
+                      imgSrc={this.state.image}
+                      ref={canvasDraw => (this.loadableCanvas = canvasDraw)}
+                      saveData={this.state.save_data}
+                      // saveData={localStorage.getItem("savedDrawing")}
+                    />  
           </div>
         )}
+        <div>
+
+
+          <ReactCrop
+                  src={this.state.image? this.state.image   : null }
+                  crop={crop}
+                  ruleOfThirds
+                  onImageLoaded={this.onImageLoaded}
+                  onComplete={this.onCropComplete}
+                  onChange={this.onCropChange}
+                  brushRadius={2}
+                />
+
+        <h2>Crop</h2>
+           
         {croppedImageUrl && (
           <img alt="Crop" style={{ maxWidth: '100%' }} src={croppedImageUrl} />
         )}
+        </div>
+
     	</div>
     );
   }
