@@ -176,12 +176,13 @@ class App extends React.Component {
         {/* {this.state.image &&<img src={this.state.image}    width='640px'height='480px' />} */}
 
         {this.state.image && 
-        <div style={{width: "1280px", height: "720px"}}>
+        <div style={{width: "850px", height: "480px"}}>
         <ReactSketchCanvas
             strokeWidth={4}
             strokeColor="red"
             ref={this.canvas}
-            background={ `url(${this.state.image}) 1280px`}
+            background={ `url(${this.state.image}) no-repeat`}
+            
 
           />
           </div>
@@ -198,7 +199,7 @@ class App extends React.Component {
           Get Image
         </button>
 
-        {this.state.new_image &&<img src={this.state.new_image}    width='640px'height='480px' />}
+        {this.state.new_image &&<img src={this.state.new_image}    width='850px'height='480px' />}
 
 
         {/* --------------- Cropping Section ---------------  */}
