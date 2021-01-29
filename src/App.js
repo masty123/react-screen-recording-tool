@@ -5,10 +5,34 @@ import React, { Component, useRef } from 'react'
 import ReactPlayer from 'react-player';
 import captureVideoFrame from 'capture-video-frame';
 import "react-video-trimmer/dist/style.css";
-import { ReactMediaRecorder } from "react-media-recorder";
-import CanvasDraw from 'react-canvas-draw';
+// import { ReactMediaRecorder } from "react-media-recorder";
+// import CanvasDraw from 'react-canvas-draw';
 import ReactCrop from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
+
+import { ReactSketchCanvas } from "react-sketch-canvas";
+
+
+const styles =  {
+  border: "0.0625rem solid #9c9c9c",
+  borderRadius: "0.25rem",
+  background: `url('../media/logo192.png')`,
+};
+ 
+// const Canvas = (props) => {
+//   console.log(props);
+//   return (
+//     <ReactSketchCanvas
+//       style={styles}
+//       width="1280px"
+//       height="720px"
+//       strokeWidth={4}
+//       strokeColor="red"
+//       background={props.image}
+//     />
+//   );
+// };
+
 
 class App extends React.Component {
 	constructor (props) {
@@ -26,8 +50,9 @@ class App extends React.Component {
       save_data: "",
       load_data: null,
       new_image: null,
-
     }
+
+    this.canvas = React.createRef();
   }
 
   setVideo(mediaItem){
@@ -119,17 +144,12 @@ class App extends React.Component {
     }
     // -------------------------------------------------------- //
     
-    exportImage(){
-      // var image = this.state.save_data.toDataURL("image/png").replace("image/png", "image/octet-stream");  // here is the most important part because if you dont replace you will get a DOM 18 exception.
-      // window.location.href = image;
-    }
 
   render() {
     const { crop, croppedImageUrl, src } = this.state;
 
     return (
-      
-    	<div className="record-frame">
+      <>
         {/* --------------- Video Player ---------------  */}
 
         <ReactPlayer 
@@ -138,8 +158,8 @@ class App extends React.Component {
           url={"./media/gran_turismo.mp4"}
           // url={this.state.mediaUrl? this.state.mediaUrl : null}
           playing={this.state.playing}
-          width='320px'
-          height='180px'
+          width='100%'
+          height='100%'
           config={{ file: { attributes: {
             crossorigin: 'anonymous'
           }}}}
@@ -153,46 +173,37 @@ class App extends React.Component {
             this.setState({ image: frame.dataUri })
           }}>Capture Frame</button>
          <br />
-        {this.state.image &&<img src={this.state.image} width='320px' />}
-       
-        {/* --------------- Drawing on image ---------------  */}
-            <h2>Drawing on Image</h2>
+        {/* {this.state.image &&<img src={this.state.image}    width='640px'height='480px' />} */}
 
-                {this.state.image? 
-                <div style={{width: "1280px", height: "720px", margin: "2rem"}}>    
-                      <button onClick={() =>  this.setState({  save_data: this.saveableCanvas.getSaveData() })} >
-                      {/* <button onClick={() => {localStorage.setItem("savedDrawing", this.saveableCanvas.getSaveData());}}> */}
-                        Save
-                      </button>
-                  <CanvasDraw
-                    ref={canvasDraw => (this.saveableCanvas = canvasDraw)}
-                    brushColor="red"
-                    imgSrc={this.state.image}
-                  />
-                  
-                </div>
-                : null}
+        {this.state.image && 
+        <div style={{width: "1280px", height: "720px"}}>
+        <ReactSketchCanvas
+            strokeWidth={4}
+            strokeColor="red"
+            ref={this.canvas}
+            background={ `url(${this.state.image}) 1280px`}
 
-
-          {this.state.image && (
-          <div style={{width: "1280px", height: "720px", margin: "2rem"}}>
-           {/* <button onClick={() => {this.loadableCanvas.loadSaveData(localStorage.getItem("savedDrawing"));}}>Load Image</button> */}
-            <button onClick={this.exportImage}>Export</button>
-           <CanvasDraw
-                      disabled
-                      hideGrid
-                      imgSrc={this.state.image}
-                      ref={canvasDraw => (this.loadableCanvas = canvasDraw)}
-                      saveData={this.state.save_data}
-                      // saveData={localStorage.getItem("savedDrawing")}
-                    />  
+          />
           </div>
-        )}
+          }
+     
+
         <div>
+
+        <button
+          onClick={() => { this.canvas.current.exportImage("png").then(data => { this.setState({new_image: data}) })
+                   .catch(e => {   console.log(e); });
+          }}
+        >
+          Get Image
+        </button>
+
+        {this.state.new_image &&<img src={this.state.new_image}    width='640px'height='480px' />}
+
 
         {/* --------------- Cropping Section ---------------  */}
 
-          <ReactCrop
+          {/* <ReactCrop
                   src={this.state.image? this.state.image   : null }
                   crop={crop}
                   ruleOfThirds
@@ -202,15 +213,17 @@ class App extends React.Component {
                   brushRadius={2}
                 />
 
+      
+
         <h2>Crop</h2>
            
         {croppedImageUrl && (
           <img alt="Crop" style={{ maxWidth: '100%' }} src={croppedImageUrl} />
-        )}
+        )} */}
 
         </div>
 
-      </div>
+      </>
       
     );
   }
@@ -235,3 +248,36 @@ export default App;
 //      </div>
 //    )}
 //  />
+
+//      {/* --------------- Drawing on image ---------------  */}
+//      <h2>Drawing on Image</h2>
+
+//      {this.state.image? 
+//      <div style={{width: "1280px", height: "720px", margin: "2rem"}}>    
+//            <button onClick={() =>  this.setState({  save_data: this.saveableCanvas.getSaveData() })} >
+//            {/* <button onClick={() => {localStorage.setItem("savedDrawing", this.saveableCanvas.getSaveData());}}> */}
+//              Save
+//            </button>
+//        <CanvasDraw
+//          ref={canvasDraw => (this.saveableCanvas = canvasDraw)}
+//          brushColor="red"
+//          imgSrc={this.state.image}
+//        />
+       
+//      </div>
+//      : null}
+
+
+// {this.state.image && (
+// <div style={{width: "1280px", height: "720px", margin: "2rem"}}>
+//  <button onClick={this.exportImage}>Export</button>
+// <CanvasDraw
+//            disabled
+//            hideGrid
+//            imgSrc={this.state.image}
+//            ref={canvasDraw => (this.loadableCanvas = canvasDraw)}
+//            saveData={this.state.save_data}
+//            // saveData={localStorage.getItem("savedDrawing")}
+//          />  
+// </div>
+// )}
