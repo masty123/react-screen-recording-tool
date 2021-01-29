@@ -23,7 +23,7 @@ class App extends React.Component {
         width: 30,
         aspect: 16 / 9,
       },
-      save_data: null,
+      save_data: "",
       load_data: null,
       new_image: null,
 
@@ -117,9 +117,12 @@ class App extends React.Component {
         }, 'image/jpeg');
       });
     }
-
-
-      // --------------------------------------------------------
+    // -------------------------------------------------------- //
+    
+    exportImage(){
+      // var image = this.state.save_data.toDataURL("image/png").replace("image/png", "image/octet-stream");  // here is the most important part because if you dont replace you will get a DOM 18 exception.
+      // window.location.href = image;
+    }
 
   render() {
     const { crop, croppedImageUrl, src } = this.state;
@@ -127,18 +130,20 @@ class App extends React.Component {
     return (
       
     	<div className="record-frame">
-      <ReactPlayer 
+        {/* --------------- Video Player ---------------  */}
+
+        <ReactPlayer 
           ref={player => { this.player = player }}
           // url="https://cdn.rawgit.com/mediaelement/mediaelement-files/4d21a042/big_buck_bunny.mp4" 
-          // url={"./video/Simba.mp4"}
-          url={this.state.mediaUrl? this.state.mediaUrl : null}
+          url={"./media/gran_turismo.mp4"}
+          // url={this.state.mediaUrl? this.state.mediaUrl : null}
           playing={this.state.playing}
           width='320px'
           height='180px'
-          // config={{ file: { attributes: {
-          //   crossorigin: 'anonymous'
-          // }}}}
-          crossOrigin={'anonymous'}
+          config={{ file: { attributes: {
+            crossorigin: 'anonymous'
+          }}}}
+          // crossOrigin={'anonymous'}
         />
         <button onClick={() => this.setState({ playing: true })}>Play</button>
         <button onClick={() => this.setState({ playing: false })}>Pause</button>
@@ -149,34 +154,12 @@ class App extends React.Component {
           }}>Capture Frame</button>
          <br />
         {this.state.image &&<img src={this.state.image} width='320px' />}
-
-
-        {/* <RecordView/> */}
-          {/* --------------- Recording tool ---------------  */}
-         <ReactMediaRecorder
-            screen
-            render={({ status, startRecording, stopRecording, mediaBlobUrl }) => (
-              <div className="text-center">
-                <p>{status}</p>
-                <div style={{alignContent: "center"}}>
-                  {/* {mediaBlobUrl? <> <video src={mediaBlobUrl} controls loop   />  </>: null} */}
-                </div>
-                <button onClick={startRecording}>Start Recording</button>
-                <button onClick={stopRecording}>Stop Recording</button>
-                {this.setVideo(mediaBlobUrl)}
-              </div>
-            )}
-          />
-
+       
         {/* --------------- Drawing on image ---------------  */}
-        <h2>Drawing on Image</h2>
-                <p>You can also set the `imgSrc` prop to draw on a background-image.</p>
-                <p>
-                  It will automatically resize to fit the canvas and centered vertically
-                  & horizontally.
-                </p>
+            <h2>Drawing on Image</h2>
+
                 {this.state.image? 
-                <div style={{width: "400px", height: "400px"}}>    
+                <div style={{width: "1280px", height: "720px", margin: "2rem"}}>    
                       <button onClick={() =>  this.setState({  save_data: this.saveableCanvas.getSaveData() })} >
                       {/* <button onClick={() => {localStorage.setItem("savedDrawing", this.saveableCanvas.getSaveData());}}> */}
                         Save
@@ -192,9 +175,9 @@ class App extends React.Component {
 
 
           {this.state.image && (
-          <div style={{width: "400px", height: "400px"}}>
+          <div style={{width: "1280px", height: "720px", margin: "2rem"}}>
            {/* <button onClick={() => {this.loadableCanvas.loadSaveData(localStorage.getItem("savedDrawing"));}}>Load Image</button> */}
-
+            <button onClick={this.exportImage}>Export</button>
            <CanvasDraw
                       disabled
                       hideGrid
@@ -207,6 +190,7 @@ class App extends React.Component {
         )}
         <div>
 
+        {/* --------------- Cropping Section ---------------  */}
 
           <ReactCrop
                   src={this.state.image? this.state.image   : null }
@@ -223,11 +207,31 @@ class App extends React.Component {
         {croppedImageUrl && (
           <img alt="Crop" style={{ maxWidth: '100%' }} src={croppedImageUrl} />
         )}
+
         </div>
 
-    	</div>
+      </div>
+      
     );
   }
 }
 
 export default App;
+
+
+   
+   {/* --------------- Recording tool ---------------  */}
+//    <ReactMediaRecorder
+//    screen
+//    render={({ status, startRecording, stopRecording, mediaBlobUrl }) => (
+//      <div className="text-center">
+//        <p>{status}</p>
+//        <div style={{alignContent: "center"}}>
+//          {/* {mediaBlobUrl? <> <video src={mediaBlobUrl} controls loop   />  </>: null} */}
+//        </div>
+//        <button onClick={startRecording}>Start Recording</button>
+//        <button onClick={stopRecording}>Stop Recording</button>
+//        {this.setVideo(mediaBlobUrl)}
+//      </div>
+//    )}
+//  />
