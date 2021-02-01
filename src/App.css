@@ -29,6 +29,25 @@
   color: #61dafb;
 }
 
+.video-player{
+  display: block;
+  margin: 2rem auto 2rem auto;
+  width: 50%;
+  height: 50%; 
+}
+
+.player-button {
+  display: block;
+  text-align: center;
+}
+
+.drawing-canvas {
+  display: block;
+  margin: 2rem auto 2rem auto;
+  width: 52.5%;
+  height: 475px; 
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);

@@ -9,7 +9,6 @@ import "react-video-trimmer/dist/style.css";
 // import CanvasDraw from 'react-canvas-draw';
 import ReactCrop from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
-
 import { ReactSketchCanvas } from "react-sketch-canvas";
 
 
@@ -55,43 +54,44 @@ class App extends React.Component {
     this.canvas = React.createRef();
   }
 
-  setVideo(mediaItem){
-    // console.log(mediaItem);
-    if(mediaItem != null && this.state.mediaUrl == null){
-      this.setState({
-        mediaUrl: mediaItem,
+    setVideo(mediaItem){
+      // console.log(mediaItem);
+      if(mediaItem != null && this.state.mediaUrl == null){
+        this.setState({
+          mediaUrl: mediaItem,
+        })
+      console.log(mediaItem);
+      } 
+    }
+
+    setImage(){
+      if(this.state.image != null){
+          return this.state.image;
+      }
+    }
+
+    async loadData(){
+      await this.setState({
+        load_data : null,
       })
-     console.log(mediaItem);
-    } 
-  }
 
-  setImage(){
-    if(this.state.image != null){
-        return this.state.image;
+      await this.setState({
+        load_data : this.state.save_data,
+      })
     }
-  }
 
-  async loadData(){
-    await this.setState({
-      load_data : null,
-    })
-
-    await this.setState({
-      load_data : this.state.save_data,
-    })
-  }
-
-  // ------------------- image cropping section ------------------------
-  async makeClientCrop(crop) {
-    if (this.imageRef && crop.width && crop.height) {
-      const croppedImageUrl = await this.getCroppedImg(
-        this.imageRef,
-        crop,
-        'newFile.jpeg'
-      );
-      this.setState({ croppedImageUrl });
+  // ------------------- image cropping section ------------------------ //
+    
+    async makeClientCrop(crop) {
+      if (this.imageRef && crop.width && crop.height) {
+        const croppedImageUrl = await this.getCroppedImg(
+          this.imageRef,
+          crop,
+          'newFile.jpeg'
+        );
+        this.setState({ croppedImageUrl });
+      }
     }
-  }
 
     // If you setState the crop in here you should return false.
     onImageLoaded = image => {
@@ -142,6 +142,7 @@ class App extends React.Component {
         }, 'image/jpeg');
       });
     }
+    
     // -------------------------------------------------------- //
     
 
@@ -149,55 +150,50 @@ class App extends React.Component {
     const { crop, croppedImageUrl, src } = this.state;
 
     return (
-      <>
+      <div>
         {/* --------------- Video Player ---------------  */}
-
-        <ReactPlayer 
-          ref={player => { this.player = player }}
-          // url="https://cdn.rawgit.com/mediaelement/mediaelement-files/4d21a042/big_buck_bunny.mp4" 
-          url={"./media/gran_turismo.mp4"}
-          // url={this.state.mediaUrl? this.state.mediaUrl : null}
-          playing={this.state.playing}
-          width='100%'
-          height='100%'
-          config={{ file: { attributes: {
-            crossorigin: 'anonymous'
-          }}}}
-          // crossOrigin={'anonymous'}
-        />
-        <button onClick={() => this.setState({ playing: true })}>Play</button>
-        <button onClick={() => this.setState({ playing: false })}>Pause</button>
-        <button onClick={() => {
-            const frame = captureVideoFrame(this.player.getInternalPlayer())
-            console.log('captured frame', frame)
-            this.setState({ image: frame.dataUri })
-          }}>Capture Frame</button>
-         <br />
-        {/* {this.state.image &&<img src={this.state.image}    width='640px'height='480px' />} */}
-
+        <div className="video-player">
+            <ReactPlayer 
+              ref={player => { this.player = player }}
+              // url="https://cdn.rawgit.com/mediaelement/mediaelement-files/4d21a042/big_buck_bunny.mp4" 
+              url={"./media/gran_turismo.mp4"}
+              // url={this.state.mediaUrl? this.state.mediaUrl : null}
+              playing={this.state.playing}
+              controls
+              width='100%'
+              height='100%'
+              config={{ file: { attributes: {
+                crossorigin: 'anonymous'
+              }}}}
+              // crossOrigin={'anonymous'}
+            />
+            <div className="player-button">
+              <button onClick={() => this.setState({ playing: !this.state.playing })}>{this.state.playing ? "Pause" : "Play"}</button>
+              <button onClick={() => {
+                  const frame = captureVideoFrame(this.player.getInternalPlayer())
+                  console.log('captured frame', frame)
+                  this.setState({ image: frame.dataUri })
+                }}>Capture Frame</button>
+            </div>
+        {/* -------------------------------------------  */}
+        </div>
+        
+        <div className="drawing-canvas">
         {this.state.image && 
-        <div style={{width: "850px", height: "480px"}}>
-        <ReactSketchCanvas
+          <ReactSketchCanvas
             strokeWidth={4}
             strokeColor="red"
             ref={this.canvas}
             background={ `url(${this.state.image}) no-repeat`}
-            
-
           />
-          </div>
-          }
+        }
+        </div>
      
-
+       {this.state.image && 
         <div>
-
-        <button
-          onClick={() => { this.canvas.current.exportImage("png").then(data => { this.setState({new_image: data}) })
-                   .catch(e => {   console.log(e); });
-          }}
-        >
-          Get Image
-        </button>
+          <button  onClick={() => { this.canvas.current.exportImage("png").then(data => { this.setState({new_image: data}) }).catch(e => {   console.log(e); }); }}>
+            Get Image
+          </button>
 
         {this.state.new_image &&<img src={this.state.new_image}    width='850px'height='480px' />}
 
@@ -214,8 +210,6 @@ class App extends React.Component {
                   brushRadius={2}
                 />
 
-      
-
         <h2>Crop</h2>
            
         {croppedImageUrl && (
@@ -223,8 +217,8 @@ class App extends React.Component {
         )} */}
 
         </div>
-
-      </>
+        }
+      </div>
       
     );
   }
