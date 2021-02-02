@@ -150,7 +150,7 @@ class App extends React.Component {
     const { crop, croppedImageUrl, src } = this.state;
 
     return (
-      <div>
+      <>
         {/* --------------- Video Player ---------------  */}
         <div className="video-player">
             <ReactPlayer 
@@ -163,7 +163,7 @@ class App extends React.Component {
               width='100%'
               height='100%'
               config={{ file: { attributes: {
-                crossorigin: 'anonymous'
+                crossOrigin: 'anonymous'
               }}}}
               // crossOrigin={'anonymous'}
             />
@@ -178,30 +178,35 @@ class App extends React.Component {
         {/* -------------------------------------------  */}
         </div>
         
-        <div className="drawing-canvas">
-        {this.state.image && 
-          <ReactSketchCanvas
-            strokeWidth={4}
-            strokeColor="red"
-            ref={this.canvas}
-            background={ `url(${this.state.image}) no-repeat`}
-          />
-        }
-        </div>
-     
-       {this.state.image && 
-        <div>
-          <button  onClick={() => { this.canvas.current.exportImage("png").then(data => { this.setState({new_image: data}) }).catch(e => {   console.log(e); }); }}>
+        {/* <div className="drawing-canvas"> */}
+          {this.state.image && 
+            <ReactSketchCanvas
+              strokeWidth={4}
+              strokeColor="red"
+              ref={this.canvas}
+              width="850px"
+              height="480px"
+              style={{margin: "0 auto 0 auto", }}
+              background={`url(${this.state.image}) no-repeat center`}
+            />
+          }
+        {/* </div> */}
+        <div className="get-image-button">
+        <button  onClick={() => { this.canvas.current.exportImage("png").then(data => { this.setState({new_image: data}) }).catch(e => {   console.log(e); }); }}>
             Get Image
-          </button>
+        </button>
+        </div>
+       {this.state.new_image && 
+        <>
+    
 
-        {this.state.new_image &&<img src={this.state.new_image}    width='850px'height='480px' />}
+        {/* {this.state.new_image &&<img src={this.state.new_image}    width='850px'height='480px' />} */}
 
 
         {/* --------------- Cropping Section ---------------  */}
-
-          {/* <ReactCrop
-                  src={this.state.image? this.state.image   : null }
+        <div className="crop-session">
+          <ReactCrop
+                  src={this.state.new_image? this.state.new_image   : null }
                   crop={crop}
                   ruleOfThirds
                   onImageLoaded={this.onImageLoaded}
@@ -209,16 +214,15 @@ class App extends React.Component {
                   onChange={this.onCropChange}
                   brushRadius={2}
                 />
-
+          </div>
         <h2>Crop</h2>
            
-        {croppedImageUrl && (
-          <img alt="Crop" style={{ maxWidth: '100%' }} src={croppedImageUrl} />
-        )} */}
-
+        <div className="crop-result">
+        {croppedImageUrl && (  <img alt="Crop" style={{ maxWidth: '100%' }} src={croppedImageUrl} /> )}
         </div>
+        </>
         }
-      </div>
+      </>
       
     );
   }

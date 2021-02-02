@@ -32,20 +32,39 @@
 .video-player{
   display: block;
   margin: 2rem auto 2rem auto;
-  width: 50%;
-  height: 50%; 
+  width: 100%;
+  height: 100%; 
 }
 
 .player-button {
   display: block;
   text-align: center;
+  margin: 2rem;
 }
 
 .drawing-canvas {
   display: block;
+  width: 100%;
+  height: 100%; 
+  /* margin: 2rem 2rem 2rem 2rem; */
+}
+
+.get-image-button {
+  display: block;
+  width: 100%;
+  height: 100%;
+  margin: 2rem;
+  text-align: center;
+}
+
+.crop-session{
+  margin-left: 400px;
+  margin-right: 400px;
+  display: block;
+}
+
+.crop-result {
   margin: 2rem auto 2rem auto;
-  width: 52.5%;
-  height: 475px; 
 }
 
 @keyframes App-logo-spin {
