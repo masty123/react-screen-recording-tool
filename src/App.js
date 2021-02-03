@@ -12,6 +12,7 @@ import 'react-image-crop/dist/ReactCrop.css';
 import { ReactSketchCanvas } from "react-sketch-canvas";
 
 
+
 const styles =  {
   border: "0.0625rem solid #9c9c9c",
   borderRadius: "0.25rem",
@@ -151,6 +152,7 @@ class App extends React.Component {
 
     return (
       <>
+      
         {/* --------------- Video Player ---------------  */}
         <div className="video-player">
             <ReactPlayer 
@@ -222,6 +224,18 @@ class App extends React.Component {
         </div>
         </>
         }
+
+
+    {/* <div className="App">
+        <header className="App-header">
+          <img src={logo} className="App-logo" alt="logo" />
+          <h1 className="App-title">Welcome to React</h1>
+        </header>
+        <p className="App-intro">
+          To get started, edit <code>src/App.js</code> and save to reload.
+        </p>
+      </div> */}
+
       </>
       
     );
