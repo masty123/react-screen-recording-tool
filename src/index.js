@@ -3,14 +3,14 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
-// import 'literallycanvas/lib/css/literallycanvas.css';
-// import registerServiceWorker from './registerServiceWorker';
-// import LiterallyCanvas from 'literallycanvas';
+import 'literallycanvas/lib/css/literallycanvas.css';
+import registerServiceWorker from './registerServiceWorker';
+import LiterallyCanvas from 'literallycanvas';
 ReactDOM.render(
   <React.StrictMode>
     <App />
+    ,
   </React.StrictMode>,
-  // <LiterallyCanvas.LiterallyCanvasReactComponent imageURLPrefix="img" />,
   document.getElementById('root')
 );
 
