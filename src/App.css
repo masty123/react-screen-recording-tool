@@ -30,10 +30,11 @@
 }
 
 .video-player{
-  display: block;
-  margin: 2rem auto 2rem auto;
+ display: block;
+  position: absolute;
   width: 100%;
   height: 100%; 
+  z-index: 2;
 }
 
 .player-button {
@@ -58,13 +59,17 @@
 }
 
 .crop-session{
-  margin-left: 400px;
-  margin-right: 400px;
+  margin-left: 25%;
+  margin-right: 25%;
   display: block;
 }
 
 .crop-result {
-  margin: 2rem auto 2rem auto;
+  display: block;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  margin-left: 25%;
+  margin-right: 25%;
 }
 
 @keyframes App-logo-spin {
@@ -76,7 +81,32 @@
   }
 }
 
-.lc-container {
-  width: 1920px;
-  height: 1080px;
+.canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  width:50%;
+  height:50%;
 }
+.literally {
+  position: absolute;
+  background-color: transparent !important;
+  z-index: 3;
+  height: 100vh !important;
+  width: 100% !important;
+}
+
+.sketch {
+  margin:100px;
+}
+
+/* .literally {
+  display: block;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+  margin-left: 2rem;
+  margin-right: 2rem;
+  align-items: center;
+} */
+

@@ -12,22 +12,50 @@ import 'react-image-crop/dist/ReactCrop.css';
 import { ReactSketchCanvas } from "react-sketch-canvas";
 
 import 'literallycanvas/lib/css/literallycanvas.css';
-import registerServiceWorker from './registerServiceWorker';
 import LiterallyCanvas from 'literallycanvas';
 
-// const Canvas = (props) => {
-//   console.log(props);
-//   return (
-//     <ReactSketchCanvas
-//       style={styles}
-//       width="1280px"
-//       height="720px"
-//       strokeWidth={4}
-//       strokeColor="red"
-//       background={props.image}
-//     />
-//   );
-// };
+
+
+var MyTool = function(lc) {  // take lc as constructor arg
+  var self = this;
+
+  return {
+    name: 'MyTool',
+    iconName: 'line',
+    strokeWidth: lc.opts.defaultStrokeWidth,
+    optionsStyle: 'stroke-width',
+
+    begin: function(x, y, lc) {
+      self.currentShape = LiterallyCanvas.createShape('Line', {
+        x1: x, y1: y, x2: x, y2: y,
+        strokeWidth: 30, color: lc.getColor('primary')});
+    },
+
+    continue: function(x, y, lc) {
+      self.currentShape.x2 = x;
+      self.currentShape.y2 = y;
+      lc.setShapesInProgress([self.currentShape]);
+    },
+
+    end: function(x, y, lc) {
+      self.currentShape.x2 = x;
+      self.currentShape.y2 = y;
+      lc.setShapesInProgress([]);
+      lc.saveShape(self.currentShape);
+    }
+  }
+};
+
+var tool = [
+  LiterallyCanvas.tools.Pencil,
+  LiterallyCanvas.tools.Eraser,
+  LiterallyCanvas.tools.Line,
+  LiterallyCanvas.tools.Rectangle,
+  LiterallyCanvas.tools.Text,
+  LiterallyCanvas.tools.Polygon,
+  LiterallyCanvas.tools.Pan,
+  LiterallyCanvas.tools.Eyedropper
+]
 
 
 class App extends React.Component {
@@ -48,7 +76,10 @@ class App extends React.Component {
       new_image: null,
 
       duration: null,
-      secondsElapsed: null
+      secondsElapsed: null,
+
+      width: window.innerWidth,
+      height: window.innerHeight,
     }
 
     this.canvas = React.createRef();
@@ -162,24 +193,27 @@ class App extends React.Component {
   }
   // -------------------------------------------------------- //
 
+
   
 
   render() {
-    const { crop, croppedImageUrl, src } = this.state;
+    const { crop, croppedImageUrl, src, width, height } = this.state;
+
     const backgroundImage = new Image()
-    backgroundImage.src = this.state.new_image;
+    backgroundImage.src = this.state.image;
+
     return (
       <>
 
         {/* --------------- Video Player ---------------  */}
-        <div className="video-player">
+        <div className="video-player">    
           <ReactPlayer
             ref={player => { this.player = player }}
             // url="https://cdn.rawgit.com/mediaelement/mediaelement-files/4d21a042/big_buck_bunny.mp4" 
-            url={"./media/gran_turismo.mp4"}
+            url={"./media/Simba.mp4"}
             // url={this.state.mediaUrl? this.state.mediaUrl : null}
             playing={this.state.playing}
-            controls
+            // controls
             width='100%'
             height='100%'
             config={{
@@ -208,10 +242,13 @@ class App extends React.Component {
 
           </div>
         </div>
-
+          <LiterallyCanvas.LiterallyCanvasReactComponent
+                imageURLPrefix="img"                 
+          />
+        
         {/* -------------------------------------------  */}
 
-
+        <div className="sketch">
         {this.state.image &&
           <ReactSketchCanvas
             strokeWidth={4}
@@ -224,16 +261,15 @@ class App extends React.Component {
           />
         }
         <div className="get-image-button">
-          <button onClick={() => { this.canvas.current.exportImage("png").then(data => { this.setState({ new_image: data }) }).catch(e => { console.log(e); }); }}>
-            Get Image
-        </button>
+            <button onClick={() => { this.canvas.current.exportImage("png").then(data => { this.setState({ new_image: data }) }).catch(e => { console.log(e); }); }}>
+              Get Image
+          </button>
+        </div>
         </div>
 
         {/* --------------- Cropping Section ---------------  */}
         {this.state.new_image &&
           <>
-
-
             <div className="crop-session">
               <ReactCrop
                 src={this.state.new_image ? this.state.new_image : null}
@@ -245,9 +281,10 @@ class App extends React.Component {
                 brushRadius={2}
               />
             </div>
-            <h2>Crop</h2>
 
             <div className="crop-result">
+              <h2>Crop</h2>
+
               {croppedImageUrl && (<img alt="Crop" style={{ maxWidth: '100%' }} src={croppedImageUrl} />)}
             </div>
           </>
@@ -263,36 +300,26 @@ class App extends React.Component {
           To get started, edit <code>src/App.js</code> and save to reload.
         </p>
       </div> */}
-        {this.state.new_image &&
-        <div className="lc-container">
-          <LiterallyCanvas.LiterallyCanvasReactComponent
-            imageURLPrefix="img"
-            backgroundShapes={[
-              LiterallyCanvas.createShape(
-                'Image', { image:   <ReactPlayer
-                  ref={player => { this.player = player }}
-                  // url="https://cdn.rawgit.com/mediaelement/mediaelement-files/4d21a042/big_buck_bunny.mp4" 
-                  url={"./media/gran_turismo.mp4"}
-                  // url={this.state.mediaUrl? this.state.mediaUrl : null}
-                  playing={this.state.playing}
-                  controls
-                  width='100%'
-                  height='100%'
-                  config={{
-                    file: {
-                      attributes: {
-                        crossOrigin: 'anonymous'
-                      }
-                    }
-                  }}
-                // crossOrigin={'anonymous'}
-                />, scale: 1 }),
-            ]}
-            
-          />
-         </div>
 
-        }
+  
+          
+
+        {/* {this.state.new_image &&
+                  <LiterallyCanvas.LiterallyCanvasReactComponent
+                imageURLPrefix="img"    
+                 backgroundShapes={[
+                 LiterallyCanvas.createShape(
+                     'Image', 
+                     { 
+                       x: 5, 
+                       y: 5, 
+                       image:  backgroundImage, 
+                       scale:"1",
+                     }),
+                   ]
+               }                
+         />
+        }  */}
       </>
 
     );
@@ -300,6 +327,29 @@ class App extends React.Component {
 }
 
 export default App;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
