@@ -1,73 +1,32 @@
-import logo from './logo.svg';
-import './App.css';
-import './index.css';
-import React, { Component, useRef } from 'react'
-import ReactPlayer from 'react-player';
-import captureVideoFrame from 'capture-video-frame';
+import logo from "./logo.svg";
+import "./App.css";
+import "./index.css";
+import React, { Component, useRef } from "react";
+import ReactPlayer from "react-player";
+import captureVideoFrame from "capture-video-frame";
 import "react-video-trimmer/dist/style.css";
 // import { ReactMediaRecorder } from "react-media-recorder";
 // import CanvasDraw from 'react-canvas-draw';
-import ReactCrop from 'react-image-crop';
-import 'react-image-crop/dist/ReactCrop.css';
+import ReactCrop from "react-image-crop";
+import "react-image-crop/dist/ReactCrop.css";
 import { ReactSketchCanvas } from "react-sketch-canvas";
 
-import 'literallycanvas/lib/css/literallycanvas.css';
-import LiterallyCanvas from 'literallycanvas';
+import "literallycanvas/lib/css/literallycanvas.css";
+import LiterallyCanvas from "literallycanvas";
 
 
-
-var MyTool = function(lc) {  // take lc as constructor arg
-  var self = this;
-
-  return {
-    name: 'MyTool',
-    iconName: 'line',
-    strokeWidth: lc.opts.defaultStrokeWidth,
-    optionsStyle: 'stroke-width',
-
-    begin: function(x, y, lc) {
-      self.currentShape = LiterallyCanvas.createShape('Line', {
-        x1: x, y1: y, x2: x, y2: y,
-        strokeWidth: 30, color: lc.getColor('primary')});
-    },
-
-    continue: function(x, y, lc) {
-      self.currentShape.x2 = x;
-      self.currentShape.y2 = y;
-      lc.setShapesInProgress([self.currentShape]);
-    },
-
-    end: function(x, y, lc) {
-      self.currentShape.x2 = x;
-      self.currentShape.y2 = y;
-      lc.setShapesInProgress([]);
-      lc.saveShape(self.currentShape);
-    }
-  }
-};
-
-var tool = [
-  LiterallyCanvas.tools.Pencil,
-  LiterallyCanvas.tools.Eraser,
-  LiterallyCanvas.tools.Line,
-  LiterallyCanvas.tools.Rectangle,
-  LiterallyCanvas.tools.Text,
-  LiterallyCanvas.tools.Polygon,
-  LiterallyCanvas.tools.Pan,
-  LiterallyCanvas.tools.Eyedropper
-]
 
 
 class App extends React.Component {
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
       playing: false,
       image: null,
       src: null,
       mediaUrl: null,
       crop: {
-        unit: '%',
+        unit: "%",
         width: 30,
         aspect: 16 / 9,
       },
@@ -80,7 +39,9 @@ class App extends React.Component {
 
       width: window.innerWidth,
       height: window.innerHeight,
-    }
+      lcRef: null,
+      lcimage: null,
+    };
 
     this.canvas = React.createRef();
   }
@@ -90,7 +51,7 @@ class App extends React.Component {
     if (mediaItem != null && this.state.mediaUrl == null) {
       this.setState({
         mediaUrl: mediaItem,
-      })
+      });
       console.log(mediaItem);
     }
   }
@@ -104,11 +65,11 @@ class App extends React.Component {
   async loadData() {
     await this.setState({
       load_data: null,
-    })
+    });
 
     await this.setState({
       load_data: this.state.save_data,
-    })
+    });
   }
 
   // ------------------- image cropping section ------------------------ //
@@ -118,18 +79,18 @@ class App extends React.Component {
       const croppedImageUrl = await this.getCroppedImg(
         this.imageRef,
         crop,
-        'newFile.jpeg'
+        "newFile.jpeg"
       );
       this.setState({ croppedImageUrl });
     }
   }
 
   // If you setState the crop in here you should return false.
-  onImageLoaded = image => {
+  onImageLoaded = (image) => {
     this.imageRef = image;
   };
 
-  onCropComplete = crop => {
+  onCropComplete = (crop) => {
     this.makeClientCrop(crop);
   };
 
@@ -140,12 +101,12 @@ class App extends React.Component {
   };
 
   getCroppedImg(image, crop, fileName) {
-    const canvas = document.createElement('canvas');
+    const canvas = document.createElement("canvas");
     const scaleX = image.naturalWidth / image.width;
     const scaleY = image.naturalHeight / image.height;
     canvas.width = crop.width;
     canvas.height = crop.height;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
 
     ctx.drawImage(
       image,
@@ -160,103 +121,134 @@ class App extends React.Component {
     );
 
     return new Promise((resolve, reject) => {
-      canvas.toBlob(blob => {
+      canvas.toBlob((blob) => {
         if (!blob) {
           //reject(new Error('Canvas is empty'));
-          console.error('Canvas is empty');
+          console.error("Canvas is empty");
           return;
         }
         blob.name = fileName;
         window.URL.revokeObjectURL(this.fileUrl);
         this.fileUrl = window.URL.createObjectURL(blob);
         resolve(this.fileUrl);
-      }, 'image/jpeg');
+      }, "image/jpeg");
     });
   }
 
   onDuration = (duration) => {
-    this.setState({ duration })
-  }
+    this.setState({ duration });
+  };
+
   onProgress = (progress) => {
     if (!this.state.duration) {
       // Sadly we don't have the duration yet so we can't do anything
-      return
+      return;
     }
 
     // progress.played is the fraction of the video that has been played
     // so multiply with duration to get number of seconds elapsed
-    const secondsElapsed = progress.played * this.state.duration
-    
+    const secondsElapsed = progress.played * this.state.duration;
+
     if (secondsElapsed !== this.state.secondsElapsed) {
-      this.setState({ secondsElapsed })
+      this.setState({ secondsElapsed });
     }
-  }
+  };
   // -------------------------------------------------------- //
 
-
-  
+  getLCReference(lc) {
+      this.setState({
+        lcRef: lc,
+      })
+  }
 
   render() {
     const { crop, croppedImageUrl, src, width, height } = this.state;
 
-    const backgroundImage = new Image()
+    const backgroundImage = new Image();
     backgroundImage.src = this.state.image;
 
     return (
       <>
-
+        {/* {this.exportLiterallyCanvasTest()} */}
         {/* --------------- Video Player ---------------  */}
-        <div className="video-player">    
-         
+        <div className="video-player">
           <div className="video-section">
             <ReactPlayer
-              ref={player => { this.player = player }}
-              // url="https://cdn.rawgit.com/mediaelement/mediaelement-files/4d21a042/big_buck_bunny.mp4" 
+              ref={(player) => {
+                this.player = player;
+              }}
+              // url="https://cdn.rawgit.com/mediaelement/mediaelement-files/4d21a042/big_buck_bunny.mp4"
               url={"./media/Simba.mp4"}
               // url={this.state.mediaUrl? this.state.mediaUrl : null}
               playing={this.state.playing}
-              controls
-              width='100%'
-              height='100%'
+              style={{
+                minHeight: "543px",                
+                minWidth: "1000px"
+              }}
+              width="100%"
+              height="100%"
               config={{
                 file: {
                   attributes: {
-                    crossOrigin: 'anonymous'
-                  }
-                }
+                    crossOrigin: "anonymous",
+                  },
+                },
               }}
               onDuration={this.onDuration}
               onProgress={this.onProgress}
               // crossOrigin={'anonymous'}
-            >
-        
-            </ReactPlayer>     
-            <LiterallyCanvas.LiterallyCanvasReactComponent
-                imageURLPrefix="img"                 
-            />
-         </div>
-            
-              
-            
-        
+            ></ReactPlayer>
+            <LiterallyCanvas.LiterallyCanvasReactComponent 
+                    imageURLPrefix="img"
+                    onInit={(lc) => this.getLCReference(lc)}
+             />
+          </div>
         </div>
-         
 
-          <div className="player-button">
-            <button onClick={() => this.setState({ playing: !this.state.playing })}>{this.state.playing ? "Pause" : "Play"}</button>
-            <button onClick={() => {
-              const frame = captureVideoFrame(this.player.getInternalPlayer())
-              console.log('captured frame', frame)
-              this.setState({ image: frame.dataUri })
-            }}>Capture Frame</button>
-          </div>
-          <div>
-            {this.state.duration}
-            <br></br>
-            {this.state.secondsElapsed}
+        <div className="player-button">
+          <button
+            onClick={() => this.setState({ playing: !this.state.playing })}
+          >
+            {this.state.playing ? "Pause" : "Play"}
+          </button>
+          <button
+            onClick={() => {
+              const frame = captureVideoFrame(this.player.getInternalPlayer());
+              console.log("captured frame", frame);
+              this.setState({ image: frame.dataUri });
+            }}
+          >
+            Capture Frame
+          </button>
+          <button
+            onClick={() => { 
+                    // var snapshot =  LiterallyCanvas.renderSnapshotToImage(this.state.lcRef );
+                    var snapshot = this.state.lcRef.getSnapshot();
+                    console.log(snapshot);
+                    var snapshot_2 = LiterallyCanvas.renderSnapshotToImage(snapshot);
+                    console.log(snapshot_2);
+                    const img = new Image();
+                    img.src = snapshot_2;
+                    this.setState({
+                        lcimage: snapshot_2
+                    })
 
-          </div>
+                }
+            }
+          >
+            Capture Drawing
+          </button>
+        </div>
         
+        <div>
+          {this.state.duration}
+          <br></br>
+          {this.state.secondsElapsed}
+          {this.state.lcimage  && <img src={this.state.lcimage}/>}
+
+        </div>
+
+
         {/* -------------------------------------------  */}
 
         {/* <div className="sketch">
@@ -301,7 +293,6 @@ class App extends React.Component {
           </>
         } */}
 
-
         {/* <div className="App">
         <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
@@ -311,9 +302,6 @@ class App extends React.Component {
           To get started, edit <code>src/App.js</code> and save to reload.
         </p>
       </div> */}
-
-  
-          
 
         {/* {this.state.new_image &&
                   <LiterallyCanvas.LiterallyCanvasReactComponent
@@ -332,39 +320,15 @@ class App extends React.Component {
          />
         }  */}
       </>
-
     );
   }
 }
 
 export default App;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-{/* --------------- Recording tool ---------------  */ }
+{
+  /* --------------- Recording tool ---------------  */
+}
 //    <ReactMediaRecorder
 //    screen
 //    render={({ status, startRecording, stopRecording, mediaBlobUrl }) => (
@@ -383,8 +347,8 @@ export default App;
 //      {/* --------------- Drawing on image ---------------  */}
 //      <h2>Drawing on Image</h2>
 
-//      {this.state.image? 
-//      <div style={{width: "1280px", height: "720px", margin: "2rem"}}>    
+//      {this.state.image?
+//      <div style={{width: "1280px", height: "720px", margin: "2rem"}}>
 //            <button onClick={() =>  this.setState({  save_data: this.saveableCanvas.getSaveData() })} >
 //            {/* <button onClick={() => {localStorage.setItem("savedDrawing", this.saveableCanvas.getSaveData());}}> */}
 //              Save
@@ -398,7 +362,6 @@ export default App;
 //      </div>
 //      : null}
 
-
 // {this.state.image && (
 // <div style={{width: "1280px", height: "720px", margin: "2rem"}}>
 //  <button onClick={this.exportImage}>Export</button>
@@ -409,6 +372,19 @@ export default App;
 //            ref={canvasDraw => (this.loadableCanvas = canvasDraw)}
 //            saveData={this.state.save_data}
 //            // saveData={localStorage.getItem("savedDrawing")}
-//          />  
+//          />
+// </div>
+// )}
+// {this.state.image && (
+// <div style={{width: "1280px", height: "720px", margin: "2rem"}}>
+//  <button onClick={this.exportImage}>Export</button>
+// <CanvasDraw
+//            disabled
+//            hideGrid
+//            imgSrc={this.state.image}
+//            ref={canvasDraw => (this.loadableCanvas = canvasDraw)}
+//            saveData={this.state.save_data}
+//            // saveData={localStorage.getItem("savedDrawing")}
+//          />
 // </div>
 // )}
