@@ -207,26 +207,41 @@ class App extends React.Component {
 
         {/* --------------- Video Player ---------------  */}
         <div className="video-player">    
-          <ReactPlayer
-            ref={player => { this.player = player }}
-            // url="https://cdn.rawgit.com/mediaelement/mediaelement-files/4d21a042/big_buck_bunny.mp4" 
-            url={"./media/Simba.mp4"}
-            // url={this.state.mediaUrl? this.state.mediaUrl : null}
-            playing={this.state.playing}
-            // controls
-            width='100%'
-            height='100%'
-            config={{
-              file: {
-                attributes: {
-                  crossOrigin: 'anonymous'
+         
+          <div className="video-section">
+            <ReactPlayer
+              ref={player => { this.player = player }}
+              // url="https://cdn.rawgit.com/mediaelement/mediaelement-files/4d21a042/big_buck_bunny.mp4" 
+              url={"./media/Simba.mp4"}
+              // url={this.state.mediaUrl? this.state.mediaUrl : null}
+              playing={this.state.playing}
+              controls
+              width='100%'
+              height='100%'
+              config={{
+                file: {
+                  attributes: {
+                    crossOrigin: 'anonymous'
+                  }
                 }
-              }
-            }}
-            onDuration={this.onDuration}
-            onProgress={this.onProgress}
-          // crossOrigin={'anonymous'}
-          />
+              }}
+              onDuration={this.onDuration}
+              onProgress={this.onProgress}
+              // crossOrigin={'anonymous'}
+            >
+        
+            </ReactPlayer>     
+            <LiterallyCanvas.LiterallyCanvasReactComponent
+                imageURLPrefix="img"                 
+            />
+         </div>
+            
+              
+            
+        
+        </div>
+         
+
           <div className="player-button">
             <button onClick={() => this.setState({ playing: !this.state.playing })}>{this.state.playing ? "Pause" : "Play"}</button>
             <button onClick={() => {
@@ -241,14 +256,10 @@ class App extends React.Component {
             {this.state.secondsElapsed}
 
           </div>
-        </div>
-          <LiterallyCanvas.LiterallyCanvasReactComponent
-                imageURLPrefix="img"                 
-          />
         
         {/* -------------------------------------------  */}
 
-        <div className="sketch">
+        {/* <div className="sketch">
         {this.state.image &&
           <ReactSketchCanvas
             strokeWidth={4}
@@ -265,10 +276,10 @@ class App extends React.Component {
               Get Image
           </button>
         </div>
-        </div>
+        </div> */}
 
         {/* --------------- Cropping Section ---------------  */}
-        {this.state.new_image &&
+        {/* {this.state.new_image &&
           <>
             <div className="crop-session">
               <ReactCrop
@@ -288,7 +299,7 @@ class App extends React.Component {
               {croppedImageUrl && (<img alt="Crop" style={{ maxWidth: '100%' }} src={croppedImageUrl} />)}
             </div>
           </>
-        }
+        } */}
 
 
         {/* <div className="App">

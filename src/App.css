@@ -30,12 +30,34 @@
 }
 
 .video-player{
- display: block;
-  position: absolute;
-  width: 100%;
-  height: 100%; 
-  z-index: 2;
+  background-color: red;
 }
+
+.video-section{
+  position: relative;
+  z-index: 0;
+  background-color: transparent;
+  margin: auto;
+}
+
+.literally {
+  position: absolute !important;
+  top: 0%;
+  background-color: transparent !important;
+  z-index: 1;
+  height: 100% !important;
+  width: 100vw !important;
+}
+
+.canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  width:50%;
+  height:50%;
+}
+
 
 .player-button {
   display: block;
@@ -81,21 +103,7 @@
   }
 }
 
-.canvas {
-  position: absolute;
-  top: 0;
-  left: 0;
-  z-index: 10;
-  width:50%;
-  height:50%;
-}
-.literally {
-  position: absolute;
-  background-color: transparent !important;
-  z-index: 3;
-  height: 100vh !important;
-  width: 100% !important;
-}
+
 
 .sketch {
   margin:100px;
