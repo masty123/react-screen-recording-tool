@@ -220,7 +220,14 @@ class App extends React.Component {
 
         <div className="player-button">
           <button
-            onClick={() => this.setState({ playing: !this.state.playing })}
+            onClick={() => {
+                this.setState({ 
+                    playing: !this.state.playing ,
+                    image: null,
+                    image_lc: null,
+                })}
+                
+            }
           >
             {this.state.playing ? "Pause" : "Play"}
           </button>
@@ -228,7 +235,10 @@ class App extends React.Component {
             onClick={() => {
               const frame = captureVideoFrame(this.player.getInternalPlayer());
             //   console.log("captured frame", frame);
-              this.setState({ image: frame.dataUri });
+              this.setState({ 
+                  image: frame.dataUri ,
+                  playing: false,
+                });
               console.log(frame.dataUri);
             }}
           >
@@ -274,24 +284,6 @@ class App extends React.Component {
 
         {/* -------------------------------------------  */}
 
-        {/* <div className="sketch">
-        {this.state.image &&
-          <ReactSketchCanvas
-            strokeWidth={4}
-            strokeColor="red"
-            ref={this.canvas}
-            width="850px"
-            height="480px"
-            style={{ margin: "0 auto 0 auto", }}
-            background={`url(${this.state.image}) no-repeat center`}
-          />
-        }
-        <div className="get-image-button">
-            <button onClick={() => { this.canvas.current.exportImage("png").then(data => { this.setState({ new_image: data }) }).catch(e => { console.log(e); }); }}>
-              Get Image
-          </button>
-        </div>
-        </div> */}
 
         {/* --------------- Cropping Section ---------------  */}
         {/* {this.state.new_image &&
@@ -315,99 +307,9 @@ class App extends React.Component {
             </div>
           </>
         } */}
-
-        {/* <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
-      </div> */}
-
-        {/* {this.state.new_image &&
-                  <LiterallyCanvas.LiterallyCanvasReactComponent
-                imageURLPrefix="img"    
-                 backgroundShapes={[
-                 LiterallyCanvas.createShape(
-                     'Image', 
-                     { 
-                       x: 5, 
-                       y: 5, 
-                       image:  backgroundImage, 
-                       scale:"1",
-                     }),
-                   ]
-               }                
-         />
-        }  */}
       </>
     );
   }
 }
 
 export default App;
-
-{
-  /* --------------- Recording tool ---------------  */
-}
-//    <ReactMediaRecorder
-//    screen
-//    render={({ status, startRecording, stopRecording, mediaBlobUrl }) => (
-//      <div className="text-center">
-//        <p>{status}</p>
-//        <div style={{alignContent: "center"}}>
-//          {/* {mediaBlobUrl? <> <video src={mediaBlobUrl} controls loop   />  </>: null} */}
-//        </div>
-//        <button onClick={startRecording}>Start Recording</button>
-//        <button onClick={stopRecording}>Stop Recording</button>
-//        {this.setVideo(mediaBlobUrl)}
-//      </div>
-//    )}
-//  />
-
-//      {/* --------------- Drawing on image ---------------  */}
-//      <h2>Drawing on Image</h2>
-
-//      {this.state.image?
-//      <div style={{width: "1280px", height: "720px", margin: "2rem"}}>
-//            <button onClick={() =>  this.setState({  save_data: this.saveableCanvas.getSaveData() })} >
-//            {/* <button onClick={() => {localStorage.setItem("savedDrawing", this.saveableCanvas.getSaveData());}}> */}
-//              Save
-//            </button>
-//        <CanvasDraw
-//          ref={canvasDraw => (this.saveableCanvas = canvasDraw)}
-//          brushColor="red"
-//          imgSrc={this.state.image}
-//        />
-
-//      </div>
-//      : null}
-
-// {this.state.image && (
-// <div style={{width: "1280px", height: "720px", margin: "2rem"}}>
-//  <button onClick={this.exportImage}>Export</button>
-// <CanvasDraw
-//            disabled
-//            hideGrid
-//            imgSrc={this.state.image}
-//            ref={canvasDraw => (this.loadableCanvas = canvasDraw)}
-//            saveData={this.state.save_data}
-//            // saveData={localStorage.getItem("savedDrawing")}
-//          />
-// </div>
-// )}
-// {this.state.image && (
-// <div style={{width: "1280px", height: "720px", margin: "2rem"}}>
-//  <button onClick={this.exportImage}>Export</button>
-// <CanvasDraw
-//            disabled
-//            hideGrid
-//            imgSrc={this.state.image}
-//            ref={canvasDraw => (this.loadableCanvas = canvasDraw)}
-//            saveData={this.state.save_data}
-//            // saveData={localStorage.getItem("savedDrawing")}
-//          />
-// </div>
-// )}
