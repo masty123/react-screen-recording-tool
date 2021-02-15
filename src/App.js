@@ -1,7 +1,7 @@
 import logo from "./logo.svg";
 import "./App.css";
 import "./index.css";
-import React, { Component, useRef } from "react";
+import React, { Component, useRef, useEffect } from "react";
 import ReactPlayer from "react-player";
 import captureVideoFrame from "capture-video-frame";
 import "react-video-trimmer/dist/style.css";
@@ -9,11 +9,10 @@ import "react-video-trimmer/dist/style.css";
 // import CanvasDraw from 'react-canvas-draw';
 import ReactCrop from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
-import { ReactSketchCanvas } from "react-sketch-canvas";
+import { Canvas, ReactSketchCanvas } from "react-sketch-canvas";
 
 import "literallycanvas/lib/css/literallycanvas.css";
 import LiterallyCanvas from "literallycanvas";
-
 
 
 
@@ -41,6 +40,7 @@ class App extends React.Component {
       height: window.innerHeight,
       lcRef: null,
       lcimage: null,
+      lc_result: null,
     };
 
     this.canvas = React.createRef();
@@ -170,7 +170,7 @@ class App extends React.Component {
     return (
       <>
         {/* {this.exportLiterallyCanvasTest()} */}
-        {/* --------------- Video Player ---------------  */}
+        {/* --------------- Video Player ---------------  */}       
         <div className="video-player">
           <div className="video-section">
             <ReactPlayer
@@ -178,7 +178,7 @@ class App extends React.Component {
                 this.player = player;
               }}
               // url="https://cdn.rawgit.com/mediaelement/mediaelement-files/4d21a042/big_buck_bunny.mp4"
-              url={"./media/Simba.mp4"}
+              url={"./media/gran_turismo.mp4"}
               // url={this.state.mediaUrl? this.state.mediaUrl : null}
               playing={this.state.playing}
               style={{
@@ -198,10 +198,23 @@ class App extends React.Component {
               onProgress={this.onProgress}
               // crossOrigin={'anonymous'}
             ></ReactPlayer>
-            <LiterallyCanvas.LiterallyCanvasReactComponent 
+           {this.state.image &&  
+                    <LiterallyCanvas.LiterallyCanvasReactComponent 
                     imageURLPrefix="img"
                     onInit={(lc) => this.getLCReference(lc)}
-             />
+                    backgroundShapes={[
+                        LiterallyCanvas.createShape(
+                            'Image', 
+                            { 
+                              x: 0, 
+                              y: 0, 
+                              image:  backgroundImage, 
+                              scale:"1.135",
+                            }),
+                          ]
+                      }   
+                    />
+            }
           </div>
         </div>
 
@@ -214,37 +227,47 @@ class App extends React.Component {
           <button
             onClick={() => {
               const frame = captureVideoFrame(this.player.getInternalPlayer());
-              console.log("captured frame", frame);
+            //   console.log("captured frame", frame);
               this.setState({ image: frame.dataUri });
+              console.log(frame.dataUri);
             }}
           >
             Capture Frame
           </button>
           <button
             onClick={() => { 
-                    // var snapshot =  LiterallyCanvas.renderSnapshotToImage(this.state.lcRef );
-                    var snapshot = this.state.lcRef.getSnapshot();
-                    console.log(snapshot);
-                    var snapshot_2 = LiterallyCanvas.renderSnapshotToImage(snapshot);
-                    console.log(snapshot_2);
-                    const img = new Image();
-                    img.src = snapshot_2;
+                    var image_lc =  this.state.lcRef.getImage().toDataURL();
+                    console.log(image_lc);
                     this.setState({
-                        lcimage: snapshot_2
+                        lcimage: image_lc
                     })
-
                 }
             }
           >
             Capture Drawing
           </button>
+          <button
+            onClick={() => {
+            
+
+
+            }}
+          >
+                Combine
+          </button>
         </div>
         
         <div>
-          {this.state.duration}
-          <br></br>
-          {this.state.secondsElapsed}
-          {this.state.lcimage  && <img src={this.state.lcimage}/>}
+            <div className="time-section">
+                  Duration:  {" "+this.state.duration}
+                        <br></br>
+                  Current time: {" "+this.state.secondsElapsed}
+                        <br></br>
+            </div>
+
+            <div className="captured-section">
+                {this.state.lcimage  && <img src={this.state.lcimage}/>}
+            </div>
 
         </div>
 

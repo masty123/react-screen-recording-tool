@@ -44,6 +44,17 @@
     min-width: 900px;
 }
 
+.time-section {
+    margin: auto;
+    width: 55%;
+    text-align: center;
+}
+
+.captured-section {
+    margin: auto;
+    width: 55%;
+}
+
 .literally {
     position: absolute !important;
     top: 0%;
